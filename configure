@@ -1,0 +1,15 @@
+#! /bin/bash
+
+CURRENT_WORKDIR="$PWD"
+
+# Clone Server Repository
+git clone https://github.com/pitagoras-educacao/server.git
+cd server
+npm install
+cd $CURRENT_WORKDIR
+
+# Clone Client Repository
+git clone https://github.com/pitagoras-educacao/client.git
+cd client
+npm install
+cd $CURRENT_WORKDIR
