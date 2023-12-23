@@ -1,3 +1,6 @@
 # Repositories
 client/
 server/
+
+# Environment variables
+.env

@@ -14,8 +14,8 @@ services:
     command: npm run start
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/pitagoras-server
-    volumes:
-      - pitagoras-database:/app/database
+    depends_on:
+      - postgres
 
   client:
     build:

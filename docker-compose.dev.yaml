@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pitagoras-dev-server
+    volumes:
+      - pitagoras-dev-database:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ${SERVER_PATH}
+      target: build
+    command: npm run dev
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/pitagoras-dev-server
+    volumes:
+      - ${SERVER_PATH}:/app
+      - ${SERVER_PATH}/node_modules:/app/node_modules
+    depends_on:
+      - postgres
+
+  client:
+    build:
+      context: ${CLIENT_PATH}
+      target: build
+      args:
+        - VITE_SERVER_HOST=http://localhost/api
+    command: npm run dev
+    volumes:
+      - ${CLIENT_PATH}:/app
+      - ${CLIENT_PATH}/node_modules:/app/node_modules
+    depends_on:
+      - server
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - server
+      - client
+    restart: always
+
+volumes:
+  pitagoras-dev-database:
