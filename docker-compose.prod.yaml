@@ -1,8 +1,19 @@
 services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pitagoras-server
+    volumes:
+      - pitagoras-database:/var/lib/postgresql/data
+
   server:
     build:
       context: ./server
     command: npm run start
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/pitagoras-server
     volumes:
       - pitagoras-database:/app/database
 
@@ -11,19 +22,23 @@ services:
       context: ./client
       args:
         - VITE_SERVER_HOST=http://localhost/api
-    command: nginx -g 'daemon off;'
     depends_on:
       - server
+    volumes:
+      - pitagoras-client:/usr/share/nginx/html
 
   nginx:
     image: nginx:latest
     ports:
       - 80:80
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf
+      - pitagoras-client:/usr/share/nginx/html
     depends_on:
       - server
       - client
+    restart: always
 
 volumes:
   pitagoras-database:
+  pitagoras-client:
